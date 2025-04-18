@@ -229,7 +229,17 @@ def process_sessions(input_file, output_file1, output_file2):
     with open(output_file2, 'w', encoding='utf-8') as f:
         json.dump(stats, f, ensure_ascii=False, indent=2)
 
+def sort_state():
+    with open("../data/sessions_stats.json", 'r', encoding='utf-8') as f:
+        stat = json.load(f)
+    bot = stat["bot_statistics"]["bot_sessions"]
+    stat["bot_statistics"]["bot_sessions"] = {str(k): v for k, v in sorted(bot.items(), key=lambda x: int(x[0]))}
+    human = stat["bot_statistics"]["human_sessions"]
+    stat["bot_statistics"]["human_sessions"] = {str(k): v for k, v in sorted(human.items(), key=lambda x: int(x[0]))}
+    with open("../data/sessions_stats.json", "w") as f:
+        json.dump(stat, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == '__main__':
     process_sessions("../data/sessions.json", "../data/sessions_detected.json","../data/sessions_stats.json")
+    sort_state()
