@@ -9,10 +9,10 @@ from collections import defaultdict
 from CrawlerDetect import Detect_Crawler
 
 # 设置全局变量，减少内存消耗
-# browscap = load_file("../data/browscap.csv")
-# with open("../data/browscap.json", 'r', encoding='utf-8') as f:
-#     memory = json.load(f)
-# disallowed_paths = []
+browscap = load_file("../data/browscap.csv")
+with open("../data/browscap.json", 'r', encoding='utf-8') as f:
+    memory = json.load(f)
+disallowed_paths = []
 sessions = []
 
 def detect_by_pybrowscap(user_agent: str) -> bool:
@@ -208,6 +208,7 @@ def process_sessions(input_file, output_file):
             objects = ijson.items(f, 'item')
             # 这个objects在这里就是相当于一个生成器，可以调用next函数取它的下一个值
             for item in objects:
+                item["duration_seconds"] = int(item["duration_seconds"])
                 sessions.append(item)
     except IOError:
         return
@@ -247,9 +248,9 @@ def process_bots(input_file, output_file, threshold):
         return
 
     # 保存结果
-    # print("writing!")
-    # with open(output_file, 'w', encoding='utf-8') as f:
-    #     json.dump(sessions, f, ensure_ascii=False, indent=2)
+    print("writing!")
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(sessions, f, ensure_ascii=False, indent=2)
 
 
 def sort_state(input_file : str):
@@ -264,7 +265,7 @@ def sort_state(input_file : str):
 
 
 if __name__ == '__main__':
-    # process_sessions("../data/sessions.json", "../data/sessions_detected.json")
-    process_bots("../data/sessions_detected.json", "../data/sessions_temp.json", 0.9)
-    process_stats("../data/sessions_stats.json")
-    sort_state("../data/sessions_stats.json")
+    process_sessions("../data/sessions_test.json", "../data/sessions_test_detected.json")
+    # process_bots("../data/sessions_detected.json", "../data/sessions_temp.json", 0.9)
+    # process_stats("../data/sessions_stats.json")
+    # sort_state("../data/sessions_stats.json")

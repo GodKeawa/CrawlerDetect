@@ -153,4 +153,4 @@ def process_json(input_file, output_file, session_timeout_minutes=30):
 
 
 if __name__ == "__main__":
-    process_json("../data/train.json", "../data/sessions.json", session_timeout_minutes=30)
+    process_json("../data/test.json", "../data/sessions_test.json", session_timeout_minutes=30)

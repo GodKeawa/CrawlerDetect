@@ -1,5 +1,6 @@
 import re
 import json
+import ijson
 from datetime import datetime
 import urllib.parse
 
@@ -61,7 +62,6 @@ def parse_log_line(line):
 
     return log_json
 
-
 def parse_log_file(file_path):
     """解析整个日志文件并返回JSON对象列表"""
     logs = []
@@ -72,6 +72,49 @@ def parse_log_file(file_path):
                 logs.append(log_json)
     return logs
 
+def convert_log_format(input_file, output_file):
+    """
+    将新格式的日志数据转换为当前数据集格式
+
+    参数:
+        input_file: 输入文件路径（新格式JSON）
+        output_file: 输出文件路径
+    """
+    converted_logs = []
+    # 读取输入文件
+    with open(input_file, 'r', encoding='utf-8') as f:
+        data = ijson.kvitems(f, '')
+
+        # 处理每条日志记录
+        for key, log_entry in data:
+            # 直接从日志条目中获取所需信息
+            try:
+                # 优先使用日志条目中的字段
+                converted_log = {
+                    "ip": log_entry.get("ip", ""),
+                    "user": None,  # 原日志中无用户信息
+                    "timestamp": log_entry.get("timestamp", "")[:-5:] + "+00:00",
+                    "method": log_entry.get("method", ""),
+                    "path": log_entry.get("resource", ""),
+                    "decoded_path": log_entry.get("resource", ""),  # 无法解码哈希路径
+                    "protocol": "HTTP/1.1",  # 默认值
+                    "status": int(log_entry.get("response", "0")),
+                    "size": int(log_entry.get("bytes", "0")),
+                    "referer": log_entry.get("referrer", None) if log_entry.get("referrer", "-") != "-" else None,
+                    "user_agent": log_entry.get("useragent", None)
+                }
+
+                converted_logs.append(converted_log)
+            except Exception as e:
+                print(f"处理日志时出错: {e}, 日志: {log_entry}")
+
+    # 保存到输出文件
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(converted_logs, f, ensure_ascii=False, indent=2)
+
+    print(f"转换完成，共处理 {len(converted_logs)} 条日志记录。")
+
+
 def test():
     _parsed_logs = parse_log_file("../tests/example.txt")
     with open("../tests/parsed_logs.json", "w", encoding="utf-8") as f:
@@ -79,6 +122,7 @@ def test():
 
 
 if __name__ == '__main__':
-    parsed_logs = parse_log_file("../data/train.log")
-    with open("../data/train.json", "w", encoding="utf-8") as f:
-        json.dump(parsed_logs, f, ensure_ascii=False, indent=2)
+    # parsed_logs = parse_log_file("../data/train.log")
+    # with open("../data/train.json", "w", encoding="utf-8") as f:
+    #     json.dump(parsed_logs, f, ensure_ascii=False, indent=2)
+    convert_log_format("../data/tests/public_v2.json", "../data/test.json")
