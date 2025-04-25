@@ -82,6 +82,43 @@ class ChannelAttention(nn.Module):
         return out
 
 
+class AttentionFusion(nn.Module):
+    """基于注意力机制的特征融合模块"""
+
+    def __init__(self, feature_dim):
+        super(AttentionFusion, self).__init__()
+
+        # 定义Wqk权重矩阵，用于特征变换
+        self.W_qk = nn.Linear(feature_dim, feature_dim)
+
+        # 定义Wv权重矩阵，用于计算注意力系数
+        self.W_v = nn.Linear(feature_dim, 1)
+
+    def forward(self, features_list):
+        # 计算每个特征的注意力系数
+        attention_scores = []
+
+        for feature in features_list:
+            # 计算 a(Xi) = Wv·tanh(Wqk·Xi)
+            transformed = torch.tanh(self.W_qk(feature))
+            score = self.W_v(transformed)
+            attention_scores.append(score)
+
+        # 拼接所有注意力系数
+        attention_scores = torch.cat(attention_scores, dim=1)
+
+        # 计算注意力权重 α(Xi) = softmax(a(Xi))
+        attention_weights = F.softmax(attention_scores, dim=1)
+
+        # 加权平均
+        fused_feature = torch.zeros_like(features_list[0])
+        for i, feature in enumerate(features_list):
+            weight = attention_weights[:, i:i + 1]
+            fused_feature += feature * weight
+
+        return fused_feature
+
+
 class SNNCD(nn.Module):
     """基于一维卷积神经网络的爬虫检测模型"""
 
@@ -109,6 +146,9 @@ class SNNCD(nn.Module):
         # 通道注意力机制
         self.channel_attention = ChannelAttention(hidden_channels)
 
+        # 添加注意力融合模块
+        self.attention_fusion = AttentionFusion(64)
+
         # 全连接分类层
         self.classifier = nn.Sequential(
             nn.Linear(64, 128),
@@ -133,8 +173,8 @@ class SNNCD(nn.Module):
         x2 = self.avg_pool(x2)  # [B, hidden, 64]
         x2 = x2.mean(dim=1)  # [B, 64]
 
-        # 融合两个分支的特征（这里使用加权平均）
-        x = (x1 + x2) / 2  # [B, 64]
+        # 使用注意力融合
+        x = self.attention_fusion([x1, x2])  # [B, 64]
 
         # 分类
         logits = self.classifier(x)
@@ -269,7 +309,7 @@ def train_model(model, train_loader, val_loader, num_epochs=10, lr=0.001, device
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'models/best_snncd_model_balanced.pth')
+            torch.save(model.state_dict(), 'models/best_snncd_model_strict.pth')
             print(f'Model saved with accuracy: {val_acc:.2f}%')
 
     return model
@@ -480,17 +520,48 @@ def evaluate_model_detailed(model, test_loader, device='cuda', save_path=None):
         'confusion_matrix': conf_matrix
     }
 
-def load_and_preprocess_data(data_path, embedder):
+
+def load_and_preprocess_data(data_path, embedder, cache_dir=None):
     """
-    加载并预处理数据
+    加载并预处理数据，支持缓存功能
 
     参数:
     - data_path: 包含JSON格式数据的文件路径
     - embedder: WebSessionEmbedder对象，用于获取请求嵌入向量
+    - cache_dir: 可选，保存解析后数据的目录路径。如果指定且目录存在，将尝试从该目录读取数据
 
     返回:
     - 训练集、验证集和测试集的数据
     """
+    # 如果指定了缓存目录，检查是否可以直接加载
+    if cache_dir is not None:
+        if os.path.exists(cache_dir):
+            try:
+                print(f"尝试从缓存目录 {cache_dir} 加载数据...")
+                # 尝试加载缓存的数据
+                train_time_length = torch.load(os.path.join(cache_dir, 'train_time_length.pt'))
+                train_embeddings = torch.load(os.path.join(cache_dir, 'train_embeddings.pt'))
+                train_labels = torch.load(os.path.join(cache_dir, 'train_labels.pt'))
+
+                val_time_length = torch.load(os.path.join(cache_dir, 'val_time_length.pt'))
+                val_embeddings = torch.load(os.path.join(cache_dir, 'val_embeddings.pt'))
+                val_labels = torch.load(os.path.join(cache_dir, 'val_labels.pt'))
+
+                test_time_length = torch.load(os.path.join(cache_dir, 'test_time_length.pt'))
+                test_embeddings = torch.load(os.path.join(cache_dir, 'test_embeddings.pt'))
+                test_labels = torch.load(os.path.join(cache_dir, 'test_labels.pt'))
+
+                print("数据集成功从缓存加载！")
+                return (
+                    (train_time_length, train_embeddings, train_labels),
+                    (val_time_length, val_embeddings, val_labels),
+                    (test_time_length, test_embeddings, test_labels)
+                )
+            except Exception as e:
+                print(f"从缓存加载数据失败: {e}")
+                print("将重新处理数据...")
+
+    # 如果没有缓存或加载缓存失败，则正常处理数据
     # 加载JSON数据
     with open(data_path, 'r', encoding='utf-8') as f:
         data = json.load(f)
@@ -501,18 +572,18 @@ def load_and_preprocess_data(data_path, embedder):
     labels = []
 
     # 处理每个会话
-    session_pbar = tqdm(data, desc="Processing sessions", leave=True)
+    session_pbar = tqdm(data, desc="处理会话数据", leave=True)
     for session in session_pbar:
         if len(session['requests']) == 0:
             continue  # 跳过没有请求的会话
-        is_bot : bool = session['is_bot']
+        is_bot: bool = session['is_bot']
 
         # 更新进度条信息
-        session_type = "Bot" if is_bot else "Human"
+        session_type = "机器人" if is_bot else "人类"
         num_requests = len(session['requests'])
         session_pbar.set_postfix({
-            'type': session_type,
-            'requests': num_requests
+            '类型': session_type,
+            '请求数': num_requests
         })
 
         # 提取请求时间和长度
@@ -667,6 +738,31 @@ def load_and_preprocess_data(data_path, embedder):
     test_embeddings = torch.tensor(embedding_data[train_size + val_size:])
     test_labels = torch.tensor(labels[train_size + val_size:])
 
+    # 如果指定了缓存目录，保存处理后的数据
+    if cache_dir is not None:
+        try:
+            # 创建目录（如果不存在）
+            os.makedirs(cache_dir, exist_ok=True)
+
+            # 保存训练集
+            torch.save(train_time_length, os.path.join(cache_dir, 'train_time_length.pt'))
+            torch.save(train_embeddings, os.path.join(cache_dir, 'train_embeddings.pt'))
+            torch.save(train_labels, os.path.join(cache_dir, 'train_labels.pt'))
+
+            # 保存验证集
+            torch.save(val_time_length, os.path.join(cache_dir, 'val_time_length.pt'))
+            torch.save(val_embeddings, os.path.join(cache_dir, 'val_embeddings.pt'))
+            torch.save(val_labels, os.path.join(cache_dir, 'val_labels.pt'))
+
+            # 保存测试集
+            torch.save(test_time_length, os.path.join(cache_dir, 'test_time_length.pt'))
+            torch.save(test_embeddings, os.path.join(cache_dir, 'test_embeddings.pt'))
+            torch.save(test_labels, os.path.join(cache_dir, 'test_labels.pt'))
+
+            print(f"数据集已成功缓存到 {cache_dir}")
+        except Exception as e:
+            print(f"缓存数据时出错: {e}")
+
     return (
         (train_time_length, train_embeddings, train_labels),
         (val_time_length, val_embeddings, val_labels),
@@ -684,14 +780,14 @@ def main():
     embedder = WebSessionEmbedder(
         use_fields=['method', 'decoded_path', 'status']
     )
-    embedder.load_model("models_balanced")
+    embedder.load_model("models_balanced_strict")
 
     # 加载数据
     print("加载和预处理数据...")
-    data_path = "../dataset/all_zip.json"
+    data_path = "../dataset/all_strict_zip.json"
     (train_time_length, train_embeddings, train_labels), \
         (val_time_length, val_embeddings, val_labels), \
-        (test_time_length, test_embeddings, test_labels) = load_and_preprocess_data(data_path, embedder)
+        (test_time_length, test_embeddings, test_labels) = load_and_preprocess_data(data_path, embedder, cache_dir="../dataset/cache")
 
     print(f"数据集大小 - 训练: {len(train_labels)}, 验证: {len(val_labels)}, 测试: {len(test_labels)}")
 
@@ -700,7 +796,7 @@ def main():
     val_dataset = CrawlerDataset(val_time_length, val_embeddings, val_labels)
     test_dataset = CrawlerDataset(test_time_length, test_embeddings, test_labels)
 
-    batch_size = 8
+    batch_size = 16
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
@@ -712,11 +808,11 @@ def main():
     # 训练模型
     print("开始训练模型...")
     model = train_model(model, train_loader, val_loader,
-                        num_epochs=40, lr=0.001, device=device)
+                        num_epochs=20, lr=0.001, device=device)
 
     # 评估模型
     # 创建保存模型评估结果的目录
-    results_dir = "evaluation_results_balanced_precise"
+    results_dir = "evaluation_results_strict"
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 

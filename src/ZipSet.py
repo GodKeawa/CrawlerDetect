@@ -87,4 +87,4 @@ if __name__ == '__main__':
     #ZipSet("../dataset/train.json", "../dataset/train_zip.json", ["method", "decoded_path", "status"])
     #ZipSet("../dataset/test.json", "../dataset/test_zip.json", ["method", "decoded_path", "status"])
     #ZipAllSet(["../dataset/train.json", "../dataset/test.json"], "../dataset/all_zip.json", ["method", "decoded_path", "status", "size", "timestamp"])
-    ZipAndBalanceSet(["../dataset/train.json", "../dataset/test.json"], "../dataset/all_zip.json", ["method", "decoded_path", "status", "size", "timestamp"])
+    ZipAndBalanceSet(["../dataset/train.json", "../dataset/test.json"], "../dataset/all_strict_zip.json", ["method", "decoded_path", "status", "size", "timestamp"])

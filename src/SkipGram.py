@@ -761,7 +761,7 @@ def main():
     )
 
     # 加载数据
-    sessions = embedder.load_data(["../dataset/all_zip.json"])
+    sessions = embedder.load_data(["../dataset/all_strict_zip.json"])
 
     # 构建词汇表
     embedder.build_vocabulary(sessions)
@@ -773,7 +773,7 @@ def main():
     embedder.initialize_model()
 
     # 训练模型
-    embedder.train(training_data, save_path="models_balanced")
+    embedder.train(training_data, save_path="models_balanced_strict")
 
     # 示例：获取会话嵌入
     if sessions:

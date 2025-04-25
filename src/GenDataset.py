@@ -92,5 +92,5 @@ def gen_dataset(input_file, output_file, stat_file, min_request, threshold):
 
 if __name__ == '__main__':
     pos = "../dataset"
-    gen_dataset("../data/sessions_detected.json", f"{pos}/train.json", f"{pos}/stat.json", 10, 1)
-    gen_dataset("../data/sessions_test_detected.json", f"{pos}/test.json", f"{pos}/test_stat.json", 10, 1)
+    gen_dataset("../data/sessions_detected.json", f"{pos}/train.json", f"{pos}/stat.json", 10, 1.8)
+    gen_dataset("../data/sessions_test_detected.json", f"{pos}/test.json", f"{pos}/test_stat.json", 10, 1.8)
