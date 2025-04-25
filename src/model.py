@@ -309,7 +309,7 @@ def train_model(model, train_loader, val_loader, num_epochs=10, lr=0.001, device
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'models/best_snncd_model_strict.pth')
+            torch.save(model.state_dict(), 'models/best_snncd_model_strict_large.pth')
             print(f'Model saved with accuracy: {val_acc:.2f}%')
 
     return model
@@ -803,7 +803,7 @@ def main():
 
     # 创建模型
     model = SNNCD(time_length_channels=4, embed_channels=32,
-                  seq_length=256, hidden_channels=8, num_blocks=8)
+                  seq_length=256, hidden_channels=16, num_blocks=12)
 
     # 训练模型
     print("开始训练模型...")
@@ -812,7 +812,7 @@ def main():
 
     # 评估模型
     # 创建保存模型评估结果的目录
-    results_dir = "evaluation_results_strict"
+    results_dir = "evaluation_results_strict_large"
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 

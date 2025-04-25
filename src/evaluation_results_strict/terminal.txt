@@ -1,0 +1,150 @@
+C:\Users\GodKe\.conda\envs\CudaEnv\python.exe D:\DevelopFolders\PyCharm\CrawlerDetect\src\model.py
+使用设备: cuda
+加载嵌入器模型...
+使用设备: cuda
+模型从 models_balanced_strict 加载完成
+加载和预处理数据...
+处理会话数据: 100%|██████████| 54527/54527 [14:07<00:00, 64.34it/s, 类型=人类, 请求数=29]
+数据集已成功缓存到 ../dataset/cache
+数据集大小 - 训练: 42151, 验证: 9032, 测试: 9034
+开始训练模型...
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]
+Epoch 1/20
+Training: 100%|████████████████████████| 2635/2635 [00:47<00:00, 55.83it/s, loss=0.2616, acc=85.71%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 165.11it/s, loss=0.2926, acc=87.50%]
+Train Loss: 0.3339 | Train Acc: 86.55% | Val Loss: 0.2525 | Val Acc: 90.98%
+Model saved with accuracy: 90.98%
+
+Epoch 2/20
+Training: 100%|███████████████████████| 2635/2635 [00:46<00:00, 56.22it/s, loss=0.0920, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 167.03it/s, loss=0.5864, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.2637 | Train Acc: 89.87% | Val Loss: 0.2453 | Val Acc: 90.80%
+
+Epoch 3/20
+Training: 100%|████████████████████████| 2635/2635 [00:48<00:00, 54.83it/s, loss=0.1807, acc=85.71%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 150.92it/s, loss=0.8033, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.2423 | Train Acc: 90.69% | Val Loss: 0.2069 | Val Acc: 92.21%
+Model saved with accuracy: 92.21%
+
+Epoch 4/20
+Training: 100%|███████████████████████| 2635/2635 [00:48<00:00, 54.46it/s, loss=0.0883, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 154.07it/s, loss=0.7923, acc=87.50%]
+Train Loss: 0.2282 | Train Acc: 91.37% | Val Loss: 0.1913 | Val Acc: 92.55%
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Model saved with accuracy: 92.55%
+
+Epoch 5/20
+Training: 100%|███████████████████████| 2635/2635 [00:48<00:00, 54.40it/s, loss=0.1183, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 148.81it/s, loss=0.9518, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.2162 | Train Acc: 92.01% | Val Loss: 0.2057 | Val Acc: 92.34%
+
+Epoch 6/20
+Training: 100%|███████████████████████| 2635/2635 [00:49<00:00, 53.71it/s, loss=0.0603, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 149.90it/s, loss=0.9985, acc=87.50%]
+Training:   0%|                                   | 0/2635 [00:00<?, ?it/s, loss=0.1942, acc=87.50%]Train Loss: 0.2061 | Train Acc: 92.60% | Val Loss: 0.1748 | Val Acc: 93.52%
+Model saved with accuracy: 93.52%
+
+Epoch 7/20
+Training: 100%|███████████████████████| 2635/2635 [00:47<00:00, 55.04it/s, loss=0.0695, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 152.60it/s, loss=1.0918, acc=87.50%]
+Train Loss: 0.2017 | Train Acc: 92.85% | Val Loss: 0.1816 | Val Acc: 93.90%
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Model saved with accuracy: 93.90%
+
+Epoch 8/20
+Training: 100%|████████████████████████| 2635/2635 [00:50<00:00, 52.51it/s, loss=0.1840, acc=85.71%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 142.14it/s, loss=1.0151, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.1991 | Train Acc: 93.04% | Val Loss: 0.1708 | Val Acc: 94.12%
+Model saved with accuracy: 94.12%
+
+Epoch 9/20
+Training: 100%|███████████████████████| 2635/2635 [00:50<00:00, 51.82it/s, loss=0.0983, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:04<00:00, 140.25it/s, loss=1.0475, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.1913 | Train Acc: 93.17% | Val Loss: 0.1660 | Val Acc: 94.11%
+
+Epoch 10/20
+Training: 100%|████████████████████████| 2635/2635 [00:50<00:00, 52.57it/s, loss=0.3168, acc=85.71%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 150.01it/s, loss=0.8116, acc=87.50%]
+Train Loss: 0.1901 | Train Acc: 93.27% | Val Loss: 0.1614 | Val Acc: 94.30%
+Model saved with accuracy: 94.30%
+
+Epoch 11/20
+Training: 100%|███████████████████████| 2635/2635 [00:46<00:00, 56.95it/s, loss=0.0669, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 187.65it/s, loss=0.9891, acc=87.50%]
+Train Loss: 0.1842 | Train Acc: 93.40% | Val Loss: 0.1572 | Val Acc: 94.55%
+Model saved with accuracy: 94.55%
+
+Epoch 12/20
+Training: 100%|███████████████████████| 2635/2635 [00:41<00:00, 64.08it/s, loss=0.0766, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:02<00:00, 194.49it/s, loss=0.8305, acc=87.50%]
+Train Loss: 0.1824 | Train Acc: 93.42% | Val Loss: 0.1706 | Val Acc: 94.57%
+Training:   0%|                                   | 0/2635 [00:00<?, ?it/s, loss=0.1389, acc=93.75%]Model saved with accuracy: 94.57%
+
+Epoch 13/20
+Training: 100%|███████████████████████| 2635/2635 [00:50<00:00, 52.68it/s, loss=0.1105, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:04<00:00, 140.54it/s, loss=0.6729, acc=87.50%]
+Train Loss: 0.1756 | Train Acc: 93.59% | Val Loss: 0.1584 | Val Acc: 94.67%
+Model saved with accuracy: 94.67%
+
+Epoch 14/20
+Training: 100%|████████████████████████| 2635/2635 [00:49<00:00, 53.22it/s, loss=0.5641, acc=71.43%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 150.97it/s, loss=0.7604, acc=87.50%]
+Training:   0%|                                   | 0/2635 [00:00<?, ?it/s, loss=0.4545, acc=81.25%]Train Loss: 0.1759 | Train Acc: 93.69% | Val Loss: 0.1648 | Val Acc: 94.40%
+
+Epoch 15/20
+Training: 100%|███████████████████████| 2635/2635 [00:48<00:00, 54.49it/s, loss=0.1141, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 167.07it/s, loss=0.5920, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.1702 | Train Acc: 93.94% | Val Loss: 0.1583 | Val Acc: 94.54%
+
+Epoch 16/20
+Training: 100%|███████████████████████| 2635/2635 [00:48<00:00, 54.54it/s, loss=0.0879, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 141.69it/s, loss=0.2499, acc=87.50%]
+Train Loss: 0.1578 | Train Acc: 94.41% | Val Loss: 0.1480 | Val Acc: 94.71%
+Model saved with accuracy: 94.71%
+
+Epoch 17/20
+Training: 100%|███████████████████████| 2635/2635 [00:49<00:00, 53.39it/s, loss=0.0267, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 147.35it/s, loss=0.2092, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.1533 | Train Acc: 94.51% | Val Loss: 0.1657 | Val Acc: 94.57%
+
+Epoch 18/20
+Training: 100%|███████████████████████| 2635/2635 [00:50<00:00, 52.15it/s, loss=0.0584, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 159.09it/s, loss=0.1473, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.1507 | Train Acc: 94.49% | Val Loss: 0.1443 | Val Acc: 95.00%
+Model saved with accuracy: 95.00%
+
+Epoch 19/20
+Training: 100%|███████████████████████| 2635/2635 [00:46<00:00, 56.13it/s, loss=0.0812, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 164.67it/s, loss=0.1850, acc=87.50%]
+Training:   0%|                                                            | 0/2635 [00:00<?, ?it/s]Train Loss: 0.1491 | Train Acc: 94.47% | Val Loss: 0.1650 | Val Acc: 94.57%
+
+Epoch 20/20
+Training: 100%|███████████████████████| 2635/2635 [00:48<00:00, 54.84it/s, loss=0.0421, acc=100.00%]
+Validation: 100%|███████████████████████| 565/565 [00:03<00:00, 159.79it/s, loss=0.1824, acc=87.50%]
+Train Loss: 0.1455 | Train Acc: 94.58% | Val Loss: 0.1484 | Val Acc: 94.86%
+进行详细模型评估...
+使用中文字体: C:/Windows/Fonts/simhei.ttf
+Evaluating model: 100%|██████████| 565/565 [00:03<00:00, 149.81it/s, acc=100.00%]
+测试准确率: 94.72%
+
+分类报告:
+              precision    recall  f1-score   support
+
+       human       0.94      0.98      0.96      6177
+         bot       0.96      0.87      0.91      2857
+
+    accuracy                           0.95      9034
+   macro avg       0.95      0.93      0.94      9034
+weighted avg       0.95      0.95      0.95      9034
+
+
+混淆矩阵:
+[[6070  107]
+ [ 370 2487]]
+
+ROC AUC: 0.9806
+平均精度分数: 0.9701
+评估报告和可视化结果已保存至 evaluation_results_strict
+最终测试准确率: 94.72%
+ROC AUC: 0.9806
+平均精度: 0.9701
+
+进程已结束，退出代码为 0
