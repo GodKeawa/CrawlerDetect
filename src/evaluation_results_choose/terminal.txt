@@ -1,0 +1,61 @@
+C:\Users\GodKe\.conda\envs\CudaEnv\python.exe D:\DevelopFolders\PyCharm\CrawlerDetect\src\model.py
+使用设备: cuda
+加载嵌入器模型...
+使用设备: cuda
+模型从 models 加载完成
+加载和预处理数据...
+数据集大小 - 训练: 30029, 验证: 6434, 测试: 6436
+开始训练模型...
+Epoch [1/20], Train Loss: 0.3190, Train Acc: 88.25%, Val Loss: 0.2634, Val Acc: 90.66%
+Model saved with accuracy: 90.66%
+Epoch [2/20], Train Loss: 0.2701, Train Acc: 90.38%, Val Loss: 0.2694, Val Acc: 90.85%
+Model saved with accuracy: 90.85%
+Epoch [3/20], Train Loss: 0.2565, Train Acc: 90.76%, Val Loss: 0.2375, Val Acc: 90.78%
+Epoch [4/20], Train Loss: 0.2483, Train Acc: 90.81%, Val Loss: 0.2377, Val Acc: 90.89%
+Model saved with accuracy: 90.89%
+Epoch [5/20], Train Loss: 0.2347, Train Acc: 91.17%, Val Loss: 0.2272, Val Acc: 91.06%
+Model saved with accuracy: 91.06%
+Epoch [6/20], Train Loss: 0.2287, Train Acc: 91.40%, Val Loss: 0.2295, Val Acc: 90.97%
+Epoch [7/20], Train Loss: 0.2216, Train Acc: 91.50%, Val Loss: 0.2358, Val Acc: 90.86%
+Epoch [8/20], Train Loss: 0.2158, Train Acc: 91.65%, Val Loss: 0.2139, Val Acc: 91.84%
+Model saved with accuracy: 91.84%
+Epoch [9/20], Train Loss: 0.2089, Train Acc: 91.68%, Val Loss: 0.2132, Val Acc: 91.81%
+Epoch [10/20], Train Loss: 0.2050, Train Acc: 92.06%, Val Loss: 0.2107, Val Acc: 92.06%
+Model saved with accuracy: 92.06%
+Epoch [11/20], Train Loss: 0.2020, Train Acc: 92.21%, Val Loss: 0.2146, Val Acc: 91.70%
+Epoch [12/20], Train Loss: 0.1983, Train Acc: 92.38%, Val Loss: 0.2116, Val Acc: 91.98%
+Epoch [13/20], Train Loss: 0.1936, Train Acc: 92.27%, Val Loss: 0.2179, Val Acc: 91.96%
+Epoch [14/20], Train Loss: 0.1904, Train Acc: 92.58%, Val Loss: 0.2171, Val Acc: 91.82%
+Epoch [15/20], Train Loss: 0.1774, Train Acc: 93.12%, Val Loss: 0.2176, Val Acc: 91.87%
+Epoch [16/20], Train Loss: 0.1735, Train Acc: 93.19%, Val Loss: 0.2242, Val Acc: 91.86%
+Epoch [17/20], Train Loss: 0.1687, Train Acc: 93.40%, Val Loss: 0.2286, Val Acc: 91.31%
+Epoch [18/20], Train Loss: 0.1689, Train Acc: 93.30%, Val Loss: 0.2187, Val Acc: 91.90%
+Epoch [19/20], Train Loss: 0.1570, Train Acc: 93.81%, Val Loss: 0.2271, Val Acc: 91.34%
+Epoch [20/20], Train Loss: 0.1512, Train Acc: 94.16%, Val Loss: 0.2280, Val Acc: 91.93%
+进行详细模型评估...
+使用中文字体: C:/Windows/Fonts/simhei.ttf
+测试准确率: 91.63%
+
+分类报告:
+              precision    recall  f1-score   support
+
+      正常用户      0.93      0.97      0.95      5302
+         爬虫       0.83      0.66      0.74      1134
+
+    accuracy                           0.92      6436
+   macro avg       0.88      0.82      0.84      6436
+weighted avg       0.91      0.92      0.91      6436
+
+
+混淆矩阵:
+[[5145  157]
+ [ 382  752]]
+
+ROC AUC: 0.9423
+平均精度分数: 0.8394
+评估报告和可视化结果已保存至 evaluation_results
+最终测试准确率: 91.63%
+ROC AUC: 0.9423
+平均精度: 0.8394
+
+进程已结束，退出代码为 0
