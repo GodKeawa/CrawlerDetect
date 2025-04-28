@@ -64,8 +64,9 @@ score_weights = {
 SVM 直接引用部分特征
 
 ### 1.2.3 参数选择
-使用 Excel 动态数据链接实现自动打表，只需要选择格式相同的数据来源就可以保证函数正常运转
-使用 Origin 进行一些作图可视化工作
+使用 Excel 动态数据链接实现自动打表，只需要选择格式相同的数据来源就可以保证函数正常运转  
+使用 Origin 进行一些作图可视化工作    
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_23-18-52.jpg)
 
 ### 1.2.4 实施时的数据处理方案
 参数根据自己的算法需要选择
