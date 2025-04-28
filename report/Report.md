@@ -395,19 +395,22 @@ ROC AUC: 0.9423
 
 ### 3.2.2 使用平衡抽样数据集进行训练
 ```log
-分类报告:  
-   				   precision    recall  f1-score   support  
-       human       		0.88      0.89      0.89      5500         
-       bot         		0.88      0.88      0.88      5253  
-       accuracy                        		0.88     10753
-       macro avg   		0.88      0.88      0.88     10753
-       weighted avg    	0.88      0.88      0.88     10753  
-  
-  
-混淆矩阵:  
-[[4893  607]  
- [ 636 4617]]  
-ROC AUC: 0.9539  
+分类报告:
+              precision    recall  f1-score   support
+
+       human       0.88      0.89      0.89      5500
+         bot       0.88      0.88      0.88      5253
+
+    accuracy                           0.88     10753
+   macro avg       0.88      0.88      0.88     10753
+weighted avg       0.88      0.88      0.88     10753
+
+
+混淆矩阵:
+[[4893  607]
+ [ 636 4617]]
+
+ROC AUC: 0.9539
 平均精度分数: 0.9545
 ```
 ![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/roc_curve2.png)
