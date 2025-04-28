@@ -9,12 +9,11 @@ import torch
 from tqdm import tqdm
 import pickle
 import matplotlib.pyplot as plt
-import seaborn as sns
 from typing import List, Dict, Any, Tuple
-from collections import defaultdict
 import ijson
 from CrawlerDetect import is_crawler
 import os
+import hashlib
 
 
 class CrawlerDetectorSVM:
@@ -39,9 +38,8 @@ class CrawlerDetectorSVM:
         self.feature_names = [
             "requests_per_second", "avg_interval_seconds", "interval_std_dev",
             "head_request_ratio", "night_access_ratio", "has_systematic_pattern",
-            "path_repetition_ratio", "missing_referer_ratio", "missing_referer_ratio_adjusted",
-            "max_bigram_ratio", "ratio_2xx", "ratio_3xx", "ratio_4xx", "ratio_5xx",
-            "ratio_404", "avg_size", "std_dev_size", "request_count", "duration_seconds"
+            "path_repetition_ratio", "missing_referer_ratio_adjusted",
+            "max_bigram_ratio", "ratio_404", "avg_size", "std_dev_size"
         ]
 
         # 记录训练历史
@@ -63,6 +61,20 @@ class CrawlerDetectorSVM:
         返回:
             特征矩阵
         """
+        cache_key = f"{','.join(sorted(sources))}_{threshold}"
+        cache_hash = hashlib.md5(cache_key.encode()).hexdigest()
+        cache_dir = "cache"
+        cache_file = os.path.join(cache_dir, f"features_{cache_hash}.pkl")
+
+        # 如果缓存目录不存在则创建
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
+
+        # 检查是否存在缓存
+        if os.path.exists(cache_file):
+            print(f"正在从缓存加载特征...")
+            with open(cache_file, 'rb') as f:
+                return pickle.load(f)
         features = []
         labels = []
 
@@ -71,51 +83,17 @@ class CrawlerDetectorSVM:
             with open(source, 'r', encoding='utf-8') as f:
                 sessions = ijson.items(f, 'item')
                 for session in tqdm(sessions, desc="特征提取"):
+                    if session.get("request_count", 0) <= 10:
+                        continue
                     # 使用提供的函数进行特征分析
                     label, analysis_results = is_crawler(session, threshold=threshold)
                     labels.append(label)
                     # 提取需要的特征
                     feature_vector = []
-
-                    # 请求速度相关特征
-                    feature_vector.append(analysis_results.get("requests_per_second", 0))
-
-                    # 间隔规律性特征
-                    feature_vector.append(analysis_results.get("avg_interval_seconds", 0))
-                    feature_vector.append(analysis_results.get("interval_std_dev", 0))
-
-                    # HEAD请求比例
-                    feature_vector.append(analysis_results.get("head_request_ratio", 0))
-
-                    # 夜间访问比例
-                    feature_vector.append(analysis_results.get("night_access_ratio", 0))
-
-                    # 系统化模式特征
-                    feature_vector.append(1 if analysis_results.get("has_systematic_pattern", False) else 0)
-
-                    # 路径重复度
-                    feature_vector.append(analysis_results.get("path_repetition_ratio", 0))
-
-                    # Referer缺失比例
-                    feature_vector.append(analysis_results.get("missing_referer_ratio", 0))
-                    feature_vector.append(analysis_results.get("missing_referer_ratio_adjusted", 0))
-
-                    # Bigram分析
-                    feature_vector.append(analysis_results.get("max_bigram_ratio", 0))
-
-                    # 状态码分布
-                    feature_vector.append(analysis_results.get("ratio_2xx", 0))
-                    feature_vector.append(analysis_results.get("ratio_3xx", 0))
-                    feature_vector.append(analysis_results.get("ratio_4xx", 0))
-                    feature_vector.append(analysis_results.get("ratio_5xx", 0))
-                    feature_vector.append(analysis_results.get("ratio_404", 0))
-
-                    # 请求大小分析
-                    feature_vector.append(analysis_results.get("avg_size", 0) or 0)  # 防止None值
-                    feature_vector.append(analysis_results.get("std_dev_size", 0) or 0)  # 防止None值
-
+                    for feature in self.feature_names:
+                        feature_vector.append(analysis_results.get(feature, 0))
                     # 会话基本统计信息
-                    feature_vector.append(len(session.get("requests", [])))
+                    feature_vector.append(session.get("request_count", 0))
                     feature_vector.append(session.get("duration_seconds", 0))
                     for i in range(len(feature_vector)):
                         if feature_vector[i] is None or not np.isfinite(float(feature_vector[i])):
@@ -126,9 +104,16 @@ class CrawlerDetectorSVM:
                     features.append(feature_vector)
 
         # 将特征列表转换为numpy数组
-        return np.array(features, dtype=np.float32), np.array(labels, dtype=np.int8)
+        # 将结果转换为numpy数组
+        result = (np.array(features, dtype=np.float32), np.array(labels, dtype=np.int8))
 
-    def train(self, X, y, test_size=0.25, random_state=42):
+        # 保存到缓存
+        with open(cache_file, 'wb') as f:
+            pickle.dump(result, f)
+
+        return result
+
+    def train(self, X, y, test_size=0.3, random_state=42):
         """
         训练SVM分类器
 
@@ -378,29 +363,29 @@ def main():
 
     # 保存模型
     detector.save_model('models/crawler_detector_svm.pkl')
-    
-    # 额外的完整数据集评估 - 保存所有样本的预测概率
-    print("\n对完整数据集进行评估和概率分析...")
-    # 使用交叉验证获取完整数据集的预测
-    from sklearn.model_selection import cross_val_predict
-    y_pred = cross_val_predict(detector.svm_pipeline, X, labels, cv=5)
-    y_prob = cross_val_predict(detector.svm_pipeline, X, labels, cv=5, method='predict_proba')
-    
-    # 创建结果DataFrame
-    results_df = pd.DataFrame({
-        'true_label': labels,
-        'predicted_label': y_pred,
-        'prob_class_0': y_prob[:, 0],
-        'prob_class_1': y_prob[:, 1],
-        'correct_prediction': labels == y_pred
-    })
-    
-    # 保存完整结果
-    os.makedirs('./prediction_results', exist_ok=True)
-    results_df.to_csv('./prediction_results/full_dataset_predictions.csv', index=False)
-    print("已保存完整数据集的预测结果到: ./prediction_results/full_dataset_predictions.csv")
 
-    print("模型训练和评估完成！")
+    # 额外的完整数据集评估 - 保存所有样本的预测概率
+    # print("\n对完整数据集进行评估和概率分析...")
+    # # 使用交叉验证获取完整数据集的预测
+    # from sklearn.model_selection import cross_val_predict
+    # y_pred = cross_val_predict(detector.svm_pipeline, X, labels, cv=5)
+    # y_prob = cross_val_predict(detector.svm_pipeline, X, labels, cv=5, method='predict_proba')
+    #
+    # # 创建结果DataFrame
+    # results_df = pd.DataFrame({
+    #     'true_label': labels,
+    #     'predicted_label': y_pred,
+    #     'prob_class_0': y_prob[:, 0],
+    #     'prob_class_1': y_prob[:, 1],
+    #     'correct_prediction': labels == y_pred
+    # })
+    #
+    # # 保存完整结果
+    # os.makedirs('./prediction_results', exist_ok=True)
+    # results_df.to_csv('./prediction_results/full_dataset_predictions.csv', index=False)
+    # print("已保存完整数据集的预测结果到: ./prediction_results/full_dataset_predictions.csv")
+    #
+    # print("模型训练和评估完成！")
 
 
 if __name__ == "__main__":

@@ -54,29 +54,38 @@ class SNNBlock(nn.Module):
 
 class ChannelAttention(nn.Module):
     """通道注意力机制"""
-
     def __init__(self, in_features):
         super(ChannelAttention, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool1d(1)
-        self.fc1 = nn.Linear(in_features, in_features // 2)  # 降维
-        self.fc2 = nn.Linear(in_features // 2, in_features)  # 升维
+        self.max_pool = nn.AdaptiveMaxPool1d(1)
+
+        # 共享MLP
+        self.fc1 = nn.Linear(in_features, in_features // 2)
+        self.fc2 = nn.Linear(in_features // 2, in_features)
 
     def forward(self, x):
         # x: [B, C, L]
         b, c, _ = x.size()
 
-        # [B, C, 1] -> [B, C]
-        y = self.avg_pool(x).squeeze(-1)
+        # 平均池化分支
+        avg_y = self.avg_pool(x).squeeze(-1)
+        avg_y = self.fc1(avg_y)
+        avg_y = torch.tanh(avg_y)
+        avg_y = self.fc2(avg_y)
 
-        # [B, C] -> [B, C/2] -> [B, C]
-        y = self.fc1(y)
-        y = torch.tanh(y)
-        y = self.fc2(y)
+        # 最大池化分支
+        max_y = self.max_pool(x).squeeze(-1)
+        max_y = self.fc1(max_y)
+        max_y = torch.tanh(max_y)
+        max_y = self.fc2(max_y)
 
-        # [B, C, 1]
+        # 合并两个分支
+        y = avg_y + max_y
+
+        # 计算注意力权重
         attention = torch.softmax(y, dim=1).unsqueeze(-1)
 
-        # [B, C, L] * [B, C, 1] -> [B, C, L]
+        # 应用注意力
         out = x * attention
 
         return out
@@ -309,7 +318,7 @@ def train_model(model, train_loader, val_loader, num_epochs=10, lr=0.001, device
         # 保存最佳模型
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model.state_dict(), 'models/best_snncd_model_strict_large.pth')
+            torch.save(model.state_dict(), 'models/best_snncd_model_strict_opt.pth')
             print(f'Model saved with accuracy: {val_acc:.2f}%')
 
     return model
@@ -787,9 +796,68 @@ def main():
     data_path = "../dataset/all_strict_zip.json"
     (train_time_length, train_embeddings, train_labels), \
         (val_time_length, val_embeddings, val_labels), \
-        (test_time_length, test_embeddings, test_labels) = load_and_preprocess_data(data_path, embedder, cache_dir="../dataset/cache")
+        (test_time_length, test_embeddings, test_labels) = load_and_preprocess_data(data_path, embedder,
+                                                                                    cache_dir="../dataset/cache")
 
     print(f"数据集大小 - 训练: {len(train_labels)}, 验证: {len(val_labels)}, 测试: {len(test_labels)}")
+
+    # 分析训练集类别分布
+    class_counts = torch.bincount(train_labels)
+    print(f"训练集类别分布: {class_counts.tolist()}")
+
+    # 执行过采样（针对少数类）
+    # 确定哪个是少数类
+    minority_class = 0 if class_counts[0] < class_counts[1] else 1
+    majority_class = 1 - minority_class
+
+    # 获取少数类样本的索引
+    minority_indices = torch.where(train_labels == minority_class)[0]
+    majority_indices = torch.where(train_labels == majority_class)[0]
+
+    # 过采样率
+    sampling_ratio = 2.0  # 默认为1表示不做过采样
+    print(f"过采样率: {sampling_ratio}")
+
+    # 计算需要过采样的数量
+    num_minority = len(minority_indices)
+    num_majority = len(majority_indices)
+    target_minority = int(num_minority * sampling_ratio)
+    print(f"少数类样本数: {num_minority}, 多数类样本数: {num_majority}")
+    print(f"过采样后的少数类目标数量: {target_minority}")
+
+    # 如果需要过采样
+    if target_minority > num_minority:
+        # 需要重复抽样的次数
+        repeats_needed = target_minority - num_minority
+
+        # 随机选择少数类样本进行重复
+        repeat_indices = minority_indices[torch.randint(len(minority_indices), (repeats_needed,))]
+
+        # 合并原始索引和重复索引
+        all_indices = torch.cat([torch.arange(len(train_labels)), repeat_indices])
+
+        # 使用这些索引来过采样数据
+        train_time_length_oversampled = train_time_length[all_indices]
+        train_embeddings_oversampled = train_embeddings[all_indices]
+        train_labels_oversampled = train_labels[all_indices]
+
+        # 打乱数据
+        perm = torch.randperm(len(train_labels_oversampled))
+        train_time_length_oversampled = train_time_length_oversampled[perm]
+        train_embeddings_oversampled = train_embeddings_oversampled[perm]
+        train_labels_oversampled = train_labels_oversampled[perm]
+
+        # 更新训练数据
+        train_time_length = train_time_length_oversampled
+        train_embeddings = train_embeddings_oversampled
+        train_labels = train_labels_oversampled
+
+        # 分析过采样后的类别分布
+        new_class_counts = torch.bincount(train_labels)
+        print(f"过采样后的训练集类别分布: {new_class_counts.tolist()}")
+        print(f"过采样后的训练集大小: {len(train_labels)}")
+    else:
+        print("不需要进行过采样")
 
     # 创建数据集和数据加载器
     train_dataset = CrawlerDataset(train_time_length, train_embeddings, train_labels)
@@ -803,7 +871,7 @@ def main():
 
     # 创建模型
     model = SNNCD(time_length_channels=4, embed_channels=32,
-                  seq_length=256, hidden_channels=16, num_blocks=12)
+                  seq_length=256, hidden_channels=8, num_blocks=8)
 
     # 训练模型
     print("开始训练模型...")
@@ -812,7 +880,7 @@ def main():
 
     # 评估模型
     # 创建保存模型评估结果的目录
-    results_dir = "evaluation_results_strict_large"
+    results_dir = "evaluation_results_strict_opt"
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 

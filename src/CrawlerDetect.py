@@ -245,14 +245,12 @@ def is_crawler(session: dict, threshold) -> Tuple[bool, Dict[str, Any]]:
     if is_obvious_crawler:
         analysis_results["crawler_score"] = 1.0 # 使用您代码中的分数
         analysis_results["reason"] = "Obvious crawler User-Agent"
-        return True, analysis_results
 
     # 检查数据量 (与您代码一致)
     if not requests or request_count < 3 :
         analysis_results["insufficient_data"] = True
         analysis_results["crawler_score"] = 0.0
         analysis_results["reason"] = "Insufficient request data"
-        return False, analysis_results
 
     # --- 开始计算各项指标 (与您代码一致的部分) ---
     # 1. 速度
@@ -389,7 +387,7 @@ def is_crawler(session: dict, threshold) -> Tuple[bool, Dict[str, Any]]:
     # 判定为爬虫的阈值 - 基于您代码中的阈值 1.5，并考虑新加的分数
     # !! 这个阈值同样需要根据实际数据调优 !!
     # threshold = 1.6 # 示例：略微提高阈值，因为添加了更多评分项
-    is_crawler_result = crawler_score >= threshold
+    is_crawler_result = (crawler_score >= threshold) or is_obvious_crawler
     analysis_results["threshold"] = threshold
 
     return is_crawler_result, analysis_results
