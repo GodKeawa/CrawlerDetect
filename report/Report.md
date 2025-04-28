@@ -42,7 +42,7 @@
 具有强区分能力，可以确保对爬虫的误报率很低，但是召回率不一定高
 
 ### 1.2.2 高级特征工程
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_22-06-21.jpg)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_22-06-21.jpg)
 
 简单的模式分析方案，属于特征工程，实施由孙旭东完成，特征和权重为：
 ```python
@@ -127,8 +127,8 @@ SVM 直接引用部分特征
 #### 访问序列模型
 参考论文的模型架构，做出少量改进
 ##### ResNet
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_22-08-57.jpg)
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_22-09-10.jpg)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_22-08-57.jpg)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_22-09-10.jpg)
 ```python
 class SNNBlock(nn.Module):  
     """残差网络块，使用1x1卷积实现残差连接"""  
@@ -167,7 +167,7 @@ class SNNBlock(nn.Module):
 ```
 
 ##### 通道注意力机制
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_18-58-42.jpg)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_18-58-42.jpg)
 ```python
 class ChannelAttention(nn.Module):
     """通道注意力机制"""
@@ -213,7 +213,7 @@ class ChannelAttention(nn.Module):
 	- 对于请求时间和大小嵌入的 4 位通道，每个通道显然是不同的特征，可以进行权重分配
 
 ##### 基于注意力的通道融合
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_22-09-38.jpg)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_22-09-38.jpg)
 ```python
 class AttentionFusion(nn.Module):  
     """基于注意力机制的特征融合模块"""  
@@ -253,7 +253,7 @@ class AttentionFusion(nn.Module):
 ```
 
 ##### 整体结构
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_22-10-04.jpg)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_22-10-04.jpg)
 ```python
 class SNNCD(nn.Module):  
     """基于一维卷积神经网络的爬虫检测模型"""  
@@ -390,8 +390,8 @@ ROC 曲线和 AUC
 ROC AUC: 0.9423  
 平均精度分数: 0.8394
 ```
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/roc_curve.png)
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/pr_curve.png)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/roc_curve.png)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/pr_curve.png)
 
 ### 3.2.2 使用平衡抽样数据集进行训练
 ```log
@@ -410,8 +410,8 @@ ROC AUC: 0.9423
 ROC AUC: 0.9539  
 平均精度分数: 0.9545
 ```
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/roc_curve2.png)
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/pr_curve2.png)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/roc_curve2.png)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/pr_curve2.png)
 ### 3.2.3 使用严格且平衡调整抽样数据集进行训练
 ```log
 分类报告:
@@ -431,8 +431,8 @@ weighted avg       0.95      0.95      0.95      9034
 ROC AUC: 0.9806
 平均精度分数: 0.9701
 ```
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/roc_curve1.png)
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/pr_curve1.png)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/roc_curve1.png)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/pr_curve1.png)
 
 ### 3.2.4 额外参数改变的效果
 经过一些基本验证，可以确定的是：
@@ -448,7 +448,7 @@ ROC AUC: 0.9806
 
 ### 3.2.5 最终结果
 参考论文结果  
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_20-02-14.jpg)  
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_20-02-14.jpg)  
 相对最优结果  
 ```log
 分类报告:
@@ -470,7 +470,7 @@ ROC AUC: 0.9806
 平均精度分数: 0.9703
 ```
 可以看出复现程度已经接近原论文
-![](https://github.com/GodKeawa/CrawlerDetect/tree/master/report/img/PixPin_2025-04-28_22-10-51.jpg)
+![](https://raw.githubusercontent.com/GodKeawa/CrawlerDetect/refs/heads/master/report/img/PixPin_2025-04-28_22-10-51.jpg)
 
 
 ## 3.3 SVM 训练
