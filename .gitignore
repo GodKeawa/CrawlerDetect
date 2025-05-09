@@ -3,3 +3,4 @@ ref
 submodule/
 .idea/
 dataset/
+*.pyc
